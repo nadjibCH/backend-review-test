@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Service;
 
-use App\Dto\GitHubEventDto;
 use App\Entity\Actor;
 use App\Entity\Event;
 use App\Entity\EventType;

@@ -2,15 +2,17 @@
 
 namespace App\Dto;
 
+use Symfony\Component\Serializer\Annotation\Context;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Validator\Constraints as Assert;
+
 class SearchInput
 {
-    /**
-     * @var \DateTimeImmutable
-     */
-    public $date;
+    #[Assert\NotNull(message: 'The date is required.')]
+    #[Assert\Type(\DateTimeImmutable::class, message: 'The date must be a valid date.')]
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
+    public \DateTimeImmutable $date;
 
-    /**
-     * @var string
-     */
-    public $keyword;
+    #[Assert\Type('string')]
+    public ?string $keyword = null;
 }

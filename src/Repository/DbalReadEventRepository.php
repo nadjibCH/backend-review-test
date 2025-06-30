@@ -3,7 +3,10 @@
 namespace App\Repository;
 
 use App\Dto\SearchInput;
+use App\Entity\EventType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Types\Types;
 
 class DbalReadEventRepository implements ReadEventRepository
 {
@@ -13,51 +16,107 @@ class DbalReadEventRepository implements ReadEventRepository
     {
         $this->connection = $connection;
     }
+    
+    /**
+     * Calculate the start and end of the day for a given date to use the created_at index
+     */
+    private function getDayBoundaries(\DateTimeImmutable $date): array
+    {
+        return [
+            'start' => $date->setTime(0, 0, 0),
+            'end'   => $date->setTime(23, 59, 59)
+        ];
+    }
 
+    /**
+     * @throws Exception
+     */
     public function countAll(SearchInput $searchInput): int
     {
+        ['start' => $start, 'end' => $end] = $this->getDayBoundaries($searchInput->date);
+        
         $sql = <<<SQL
         SELECT sum(count) as count
         FROM event
-        WHERE date(create_at) = :date
-        AND payload like %{$searchInput->keyword}%
+        WHERE created_at BETWEEN :start AND :end
+        AND payload::text like :keyword
 SQL;
 
-        return (int) $this->connection->fetchOne($sql, [
-            'date' => $searchInput->date
-        ]);
+        return (int) $this->connection->fetchOne(
+            $sql,
+            [
+                'start' => $start,
+                'end' => $end,
+                'keyword' => '%' . $searchInput->keyword . '%'
+            ],
+            [
+                'start'   => Types::DATETIME_IMMUTABLE,
+                'end'     => Types::DATETIME_IMMUTABLE,
+                'keyword' => Types::STRING,
+            ]
+        );
     }
 
+    /**
+     * @throws Exception
+     */
     public function countByType(SearchInput $searchInput): array
     {
+        ['start' => $start, 'end' => $end] = $this->getDayBoundaries($searchInput->date);
+
         $sql = <<<'SQL'
             SELECT type, sum(count) as count
             FROM event
-            WHERE date(create_at) = :date
-            AND payload like %{$searchInput->keyword}%
+            WHERE created_at BETWEEN :start AND :end
+            AND payload::text like :keyword
             GROUP BY type
 SQL;
 
-        return $this->connection->fetchAllKeyValue($sql, [
-            'date' => $searchInput->date
-        ]);
+        return $this->connection->fetchAllKeyValue(
+            $sql,
+            [
+                'start' => $start,
+                'end' => $end,
+                'keyword' => '%' . $searchInput->keyword . '%'
+            ],
+            [
+                'start'   => Types::DATETIME_IMMUTABLE,
+                'end'     => Types::DATETIME_IMMUTABLE,
+                'keyword' => Types::STRING,
+            ]
+        );
     }
 
+    /**
+     * @throws Exception
+     */
     public function statsByTypePerHour(SearchInput $searchInput): array
     {
+        ['start' => $start, 'end' => $end] = $this->getDayBoundaries($searchInput->date);
+        
         $sql = <<<SQL
-            SELECT extract(hour from create_at) as hour, type, sum(count) as count
+            SELECT extract(hour from created_at) as hour, type, sum(count) as count
             FROM event
-            WHERE date(create_at) = :date
-            AND payload like %{$searchInput->keyword}%
-            GROUP BY TYPE, EXTRACT(hour from create_at)
+            WHERE created_at BETWEEN :start AND :end
+            AND payload::text like :keyword
+            GROUP BY TYPE, EXTRACT(hour from created_at)
 SQL;
 
-        $stats = $this->connection->fetchAll($sql, [
-            'date' => $searchInput->date
-        ]);
+        $stats = $this->connection->fetchAllAssociative(
+            $sql,
+            [
+                'start' => $start,
+                'end' => $end,
+                'keyword' => '%' . $searchInput->keyword . '%'
+            ],
+            [
+                'start'   => Types::DATETIME_IMMUTABLE,
+                'end'     => Types::DATETIME_IMMUTABLE,
+                'keyword' => Types::STRING,
+            ]
+        );
 
-        $data = array_fill(0, 24, ['commit' => 0, 'pullRequest' => 0, 'comment' => 0]);
+        $data = array_fill(0, 24, [EventType::COMMIT => 0, EventType::PULL_REQUEST => 0, EventType::COMMENT => 0]);
 
         foreach ($stats as $stat) {
             $data[(int) $stat['hour']][$stat['type']] = $stat['count'];
@@ -66,29 +125,47 @@ SQL;
         return $data;
     }
 
+    /**
+     * @throws Exception
+     */
     public function getLatest(SearchInput $searchInput): array
     {
+        ['start' => $start, 'end' => $end] = $this->getDayBoundaries($searchInput->date);
+        
         $sql = <<<SQL
-            SELECT type, repo
-            FROM event
-            WHERE date(create_at) = :date
-            AND payload like %{$searchInput->keyword}%
+            SELECT e.type, r.name AS repo, e.payload::text AS payload
+            FROM event e
+            JOIN repo r ON e.repo_id = r.id
+            WHERE e.created_at BETWEEN :start AND :end
+            AND e.payload::text LIKE :keyword
+            ORDER BY created_at DESC
+            LIMIT 10
 SQL;
 
-        $result = $this->connection->fetchAllAssociative($sql, [
-            'date' => $searchInput->date,
-            'keyword' => $searchInput->keyword,
-        ]);
+        $result = $this->connection->fetchAllAssociative(
+            $sql,
+            [
+                'start' => $start,
+                'end' => $end,
+                'keyword' => '%' . $searchInput->keyword . '%',
+            ],
+            [
+                'start'   => Types::DATETIME_IMMUTABLE,
+                'end'     => Types::DATETIME_IMMUTABLE,
+                'keyword' => Types::STRING,
+            ]
+        );
 
-        $result = array_map(static function($item) {
+        return array_map(static function($item) {
             $item['repo'] = json_decode($item['repo'], true);
 
             return $item;
         }, $result);
-
-        return $result;
     }
 
+    /**
+     * @throws Exception
+     */
     public function exist(int $id): bool
     {
         $sql = <<<SQL

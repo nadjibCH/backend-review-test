@@ -2,61 +2,35 @@
 
 namespace App\Controller;
 
-use App\Dto\EventInput;
-use App\Repository\ReadEventRepository;
-use App\Repository\WriteEventRepository;
+use App\Service\EventCommentService;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class EventController
+readonly class EventController
 {
-    private WriteEventRepository $writeEventRepository;
-    private ReadEventRepository $readEventRepository;
-    private SerializerInterface $serializer;
-
     public function __construct(
-        WriteEventRepository $writeEventRepository,
-        ReadEventRepository $readEventRepository,
-        SerializerInterface $serializer
-    ) {
-        $this->writeEventRepository = $writeEventRepository;
-        $this->readEventRepository = $readEventRepository;
-        $this->serializer = $serializer;
-    }
+        private EventCommentService $eventCommentService
+    ) {}
 
     /**
-     * @Route(path="/api/event/{id}/update", name="api_commit_update", methods={"PUT"})
+     * Update an event's comment
+     * 
+     * @Route(path="/api/events/{id}/comment", name="api_event_comment", methods={"PATCH"})
      */
-    public function update(Request $request, int $id, ValidatorInterface $validator): Response
+    public function update(Request $request, int $id): JsonResponse
     {
-        $eventInput = $this->serializer->deserialize($request->getContent(), EventInput::class, 'json');
-
-        $errors = $validator->validate($eventInput);
-
-        if (\count($errors) > 0) {
-            return new JsonResponse(
-                ['message' => $errors->get(0)->getMessage()],
-                Response::HTTP_BAD_REQUEST
-            );
-        }
-
-        if($this->readEventRepository->exist($id) === false) {
-            return new JsonResponse(
-                ['message' => sprintf('Event identified by %d not found !', $id)],
-                Response::HTTP_NOT_FOUND
-            );
-        }
-
         try {
-            $this->writeEventRepository->update($eventInput, $id);
-        } catch (\Exception $exception) {
-            return new Response(null, Response::HTTP_SERVICE_UNAVAILABLE);
+            $this->eventCommentService->processEventCommentUpdate($request->getContent(), $id);
+            return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+        } catch (NotFoundHttpException $e) {
+            return new JsonResponse(['message' => $e->getMessage()], JsonResponse::HTTP_NOT_FOUND);
+        } catch (BadRequestHttpException $e) {
+            return new JsonResponse(['message' => $e->getMessage()], JsonResponse::HTTP_BAD_REQUEST);
+        } catch (\Doctrine\DBAL\Exception $e) {
+            return new JsonResponse(['message' => 'Service unavailable'], JsonResponse::HTTP_SERVICE_UNAVAILABLE);
         }
-
-        return new Response(null, Response::HTTP_NO_CONTENT);
     }
 }

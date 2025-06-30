@@ -2,13 +2,12 @@
 
 namespace App\Repository;
 
-use App\Dto\EventInput;
-use App\Entity\Event;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Dto\EventCommentInput;
 use App\Entity\Actor;
+use App\Entity\Event;
 use App\Entity\Repo;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
 
 class DbalWriteEventRepository implements WriteEventRepository
 {
@@ -27,7 +26,7 @@ class DbalWriteEventRepository implements WriteEventRepository
         $this->entityManager = $entityManager;
     }
 
-    public function update(EventInput $authorInput, int $id): void
+    public function update(EventCommentInput $authorInput, int $id): void
     {
         $sql = <<<SQL
         UPDATE event
