@@ -2,10 +2,10 @@
 
 namespace App\Service;
 
+use App\Dto\Input\SearchInput;
 use App\Dto\Output\SearchDataOutput;
 use App\Dto\Output\SearchMetaOutput;
 use App\Dto\Output\SearchOutput;
-use App\Dto\SearchInput;
 use App\Entity\EventType;
 use App\Repository\ReadEventRepository;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

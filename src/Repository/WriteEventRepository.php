@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Dto\EventCommentInput;
+use App\Dto\Input\EventCommentInput;
 use App\Entity\Actor;
 use App\Entity\Event;
 use App\Entity\Repo;

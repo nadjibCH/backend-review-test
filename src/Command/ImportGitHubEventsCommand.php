@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Dto\Input\ImportGitHubEventsInput;
+use App\Exception\FlushBatchException;
+use App\Repository\WriteEventRepository;
 use App\Service\GitHubArchiveStreamer;
 use App\Service\GitHubEventProcessor;
+use App\Utils\ErrorFileLogger;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Attribute\AsCommand;
-use App\Dto\ImportGitHubEventsInput;
-use App\Utils\ErrorFileLogger;
-use App\Repository\WriteEventRepository;
-use App\Exception\FlushBatchException;
 
 #[AsCommand(name: 'app:import-github-events')]
 class ImportGitHubEventsCommand extends Command

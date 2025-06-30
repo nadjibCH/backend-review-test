@@ -11,7 +11,8 @@ final class Version20220224161501 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Create event, actor and repo tables';    }
+        return 'Create event, actor and repo tables';    
+    }
 
     public function up(Schema $schema): void
     {

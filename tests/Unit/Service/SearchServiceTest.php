@@ -2,7 +2,7 @@
 
 namespace App\Tests\Unit\Service;
 
-use App\Dto\SearchInput;
+use App\Dto\Input\SearchInput;
 use App\Entity\Event;
 use App\Entity\EventType;
 use App\Repository\ReadEventRepository;

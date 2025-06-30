@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Dto\GitHubEventDto;
+use App\Dto\Input\GitHubEventDto;
 use App\Entity\Event;
 use App\Enum\GitHubEventType;
 use App\Exception\GitHubEventProcessingException;

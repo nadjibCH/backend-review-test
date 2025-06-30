@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Dto\SearchInput;
+use App\Dto\Input\SearchInput;
 use App\Entity\EventType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;

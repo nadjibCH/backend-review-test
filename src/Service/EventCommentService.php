@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Dto\EventCommentInput;
+use App\Dto\Input\EventCommentInput;
 use App\Repository\ReadEventRepository;
 use App\Repository\WriteEventRepository;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

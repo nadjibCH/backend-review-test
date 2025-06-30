@@ -2,7 +2,7 @@
 
 namespace App\Tests\Unit\Service;
 
-use App\Dto\EventCommentInput;
+use App\Dto\Input\EventCommentInput;
 use App\Repository\ReadEventRepository;
 use App\Repository\WriteEventRepository;
 use App\Service\EventCommentService;
