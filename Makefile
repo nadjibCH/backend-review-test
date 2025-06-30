@@ -105,7 +105,10 @@ unit-test: vendor ## Run PhpUnit unit testsuite
 	@$(call log_success,Done)
 
 .PHONY: func-test
-func-test: var/docker.up ## Run PhpUnit functionnal testsuite
+func-test: var/docker.up ## Run PhpUnit functional testsuite
 	@$(call log,Running ...)
 	$(PHP_EXEC) bin/phpunit -v --testsuite func --testdox
 	@$(call log_success,Done)
+
+.PHONY: test
+test: db-test unit-test func-test ## Run all testsuites
