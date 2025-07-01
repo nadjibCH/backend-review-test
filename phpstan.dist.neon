@@ -1,0 +1,22 @@
+includes:
+  - vendor/phpstan/phpstan-symfony/extension.neon
+
+parameters:
+  level: 8
+  paths:
+    - src
+    - tests
+  ignoreErrors:
+    -
+      # regex for the “no value type specified in iterable type array” part
+      message: '#no value type specified in iterable type array#'
+      
+  bootstrapFiles:
+    - %rootDir%/../../../vendor/autoload.php
+
+  symfony:
+    containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+
+  excludePaths:
+    - vendor/*
+    - var/*

@@ -1,26 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
-use App\Dto\SearchInput;
-use App\Repository\ReadEventRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\SearchService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class SearchController
+readonly class SearchController
 {
-    private ReadEventRepository $repository;
-    private SerializerInterface $serializer;
-
     public function __construct(
-        ReadEventRepository $repository,
-        SerializerInterface  $serializer
+        private SearchService $searchService,
+        private SerializerInterface $serializer,
     ) {
-        $this->repository = $repository;
-        $this->serializer = $serializer;
     }
 
     /**
@@ -28,23 +25,25 @@ class SearchController
      */
     public function searchCommits(Request $request): JsonResponse
     {
-        $searchInput = $this->serializer->denormalize($request->query->all(), SearchInput::class);
+        try {
+            $output = $this->searchService->processSearch($request->query->all());
 
-        $countByType = $this->repository->countByType($searchInput);
-
-        $data = [
-            'meta' => [
-                'totalEvents' => $this->repository->countAll($searchInput),
-                'totalPullRequests' => $countByType['pullRequest'] ?? 0,
-                'totalCommits' => $countByType['commit'] ?? 0,
-                'totalComments' => $countByType['comment'] ?? 0,
-            ],
-            'data' => [
-                'events' => $this->repository->getLatest($searchInput),
-                'stats' => $this->repository->statsByTypePerHour($searchInput)
-            ]
-        ];
-
-        return new JsonResponse($data);
+            return new JsonResponse(
+                $this->serializer->serialize($output, 'json'),
+                Response::HTTP_OK,
+                [],
+                true
+            );
+        } catch (BadRequestHttpException $e) {
+            return new JsonResponse(
+                ['error' => $e->getMessage()],
+                Response::HTTP_BAD_REQUEST
+            );
+        } catch (\Throwable $e) {
+            return new JsonResponse(
+                ['error' => 'Internal server error'],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }

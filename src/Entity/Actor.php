@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 /**
  * @ORM\Entity()
+ *
  * @ORM\Table(name="actor")
  */
 class Actor
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="bigint")
+     *
      * @ORM\GeneratedValue(strategy="NONE")
      */
     public int $id;
@@ -35,9 +39,9 @@ class Actor
 
     public function __construct(int $id, string $login, string $url, string $avatarUrl)
     {
-        $this->id = $id;
-        $this->login = $login;
-        $this->url = $url;
+        $this->id        = $id;
+        $this->login     = $login;
+        $this->url       = $url;
         $this->avatarUrl = $avatarUrl;
     }
 
@@ -50,7 +54,6 @@ class Actor
     {
         return $this->login;
     }
-
 
     public function url(): string
     {
@@ -71,5 +74,4 @@ class Actor
             $data['avatar_url']
         );
     }
-
 }

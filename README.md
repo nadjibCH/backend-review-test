@@ -72,6 +72,20 @@ make db-test
 make func-test
 ```
 
+### GitHub Events Import Command
+
+The application includes a command to import GitHub events from [GH Archive](https://www.gharchive.org/). This command allows you to import events for a specific date whit or without hour.
+
+#### Usage
+
+```bash
+# Import events for a specific date
+php bin/console app:import-github-events 2015-01-01 --no-debug
+
+# Import events for a specific hour (0-23)
+php bin/console app:import-github-events 2015-01-01 --hour=15 --no-debug
+```
+
 ### Stop the development environment
 
 You can stop the development environment running this command:
