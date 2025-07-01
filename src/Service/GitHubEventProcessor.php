@@ -15,16 +15,17 @@ class GitHubEventProcessor
 {
     public function __construct(
         private readonly WriteEventRepository $writeEventRepository,
-        private readonly ReadEventRepository $readEventRepository
+        private readonly ReadEventRepository $readEventRepository,
     ) {
     }
 
     /**
-     * Converts a GitHub event type to internal EventType
+     * Converts a GitHub event type to internal EventType.
      */
     public function mapGitHubEventTypeToEventType(string $githubEventType): ?string
     {
         $type = GitHubEventType::fromString($githubEventType);
+
         return $type?->toEventType();
     }
 
@@ -32,7 +33,7 @@ class GitHubEventProcessor
     {
         $eventDto = new GitHubEventDto($rawEvent);
 
-        if (!in_array($eventDto->getType(), GitHubEventType::values())) {
+        if (!\in_array($eventDto->getType(), GitHubEventType::values())) {
             return false;
         }
 
@@ -75,7 +76,7 @@ class GitHubEventProcessor
 
             return true;
         } catch (\Exception $e) {
-            throw GitHubEventProcessingException::processingFailed((string)$eventDto->getId(), $e);
+            throw GitHubEventProcessingException::processingFailed((string) $eventDto->getId(), $e);
         }
     }
 }

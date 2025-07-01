@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto\Input;
 
 use Symfony\Component\Serializer\Annotation\Context;
@@ -18,7 +20,7 @@ class SearchInput
 
     public function __construct(\DateTimeImmutable $date, ?string $keyword = null)
     {
-        $this->date = $date;
+        $this->date    = $date;
         $this->keyword = $keyword;
     }
 }

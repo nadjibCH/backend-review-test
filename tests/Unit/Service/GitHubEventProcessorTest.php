@@ -25,18 +25,17 @@ class GitHubEventProcessorTest extends TestCase
     protected function setUp(): void
     {
         $this->writeEventRepository = $this->createMock(WriteEventRepository::class);
-        $this->readEventRepository = $this->createMock(ReadEventRepository::class);
-        $this->processor = new GitHubEventProcessor(
+        $this->readEventRepository  = $this->createMock(ReadEventRepository::class);
+        $this->processor            = new GitHubEventProcessor(
             $this->writeEventRepository,
             $this->readEventRepository
         );
     }
 
     /**
-     * @test
      * @dataProvider eventTypeProvider
      */
-    public function it_should_map_github_event_type_to_event_type(string $githubEventType, ?string $expectedEventType): void
+    public function testItShouldMapGithubEventTypeToEventType(string $githubEventType, ?string $expectedEventType): void
     {
         $actualEventType = $this->processor->mapGitHubEventTypeToEventType($githubEventType);
         $this->assertEquals($expectedEventType, $actualEventType);
@@ -45,35 +44,32 @@ class GitHubEventProcessorTest extends TestCase
     public function eventTypeProvider(): array
     {
         return [
-            'Push event' => ['PushEvent', EventType::COMMIT],
-            'Issue comment event' => ['IssueCommentEvent', EventType::COMMENT],
+            'Push event'                        => ['PushEvent', EventType::COMMIT],
+            'Issue comment event'               => ['IssueCommentEvent', EventType::COMMENT],
             'Pull request review comment event' => ['PullRequestReviewCommentEvent', EventType::COMMENT],
-            'Commit comment event' => ['CommitCommentEvent', EventType::COMMENT],
-            'Pull request event' => ['PullRequestEvent', EventType::PULL_REQUEST],
+            'Commit comment event'              => ['CommitCommentEvent', EventType::COMMENT],
+            'Pull request event'                => ['PullRequestEvent', EventType::PULL_REQUEST],
         ];
     }
 
-    /**
-     * @test
-     */
-    public function it_should_process_valid_event(): void
+    public function testItShouldProcessValidEvent(): void
     {
         $rawEvent = [
-            'id' => '12345',
-            'type' => GitHubEventType::PUSH->value,
+            'id'         => '12345',
+            'type'       => GitHubEventType::PUSH->value,
             'created_at' => '2023-01-01T05:00:00Z',
-            'actor' => [
-                'id' => 123,
-                'login' => 'testuser',
-                'url' => 'https://api.github.com/users/testuser',
-                'avatar_url' => 'https://avatars.githubusercontent.com/u/123'
+            'actor'      => [
+                'id'         => 123,
+                'login'      => 'testuser',
+                'url'        => 'https://api.github.com/users/testuser',
+                'avatar_url' => 'https://avatars.githubusercontent.com/u/123',
             ],
             'repo' => [
-                'id' => 456,
+                'id'   => 456,
                 'name' => 'testuser/testrepo',
-                'url' => 'https://api.github.com/repos/testuser/testrepo'
+                'url'  => 'https://api.github.com/repos/testuser/testrepo',
             ],
-            'payload' => ['ref' => 'refs/heads/main']
+            'payload' => ['ref' => 'refs/heads/main'],
         ];
 
         $this->readEventRepository->expects($this->once())
@@ -101,27 +97,24 @@ class GitHubEventProcessorTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @test
-     */
-    public function it_should_skip_processing_if_event_already_exists(): void
+    public function testItShouldSkipProcessingIfEventAlreadyExists(): void
     {
         $rawEvent = [
-            'id' => '12345',
-            'type' => GitHubEventType::PUSH->value,
+            'id'         => '12345',
+            'type'       => GitHubEventType::PUSH->value,
             'created_at' => '2023-01-01T05:00:00Z',
-            'actor' => [
-                'id' => 123,
-                'login' => 'testuser',
-                'url' => 'https://api.github.com/users/testuser',
-                'avatar_url' => 'https://avatars.githubusercontent.com/u/123'
+            'actor'      => [
+                'id'         => 123,
+                'login'      => 'testuser',
+                'url'        => 'https://api.github.com/users/testuser',
+                'avatar_url' => 'https://avatars.githubusercontent.com/u/123',
             ],
             'repo' => [
-                'id' => 456,
+                'id'   => 456,
                 'name' => 'testuser/testrepo',
-                'url' => 'https://api.github.com/repos/testuser/testrepo'
+                'url'  => 'https://api.github.com/repos/testuser/testrepo',
             ],
-            'payload' => ['ref' => 'refs/heads/main']
+            'payload' => ['ref' => 'refs/heads/main'],
         ];
 
         $this->readEventRepository->expects($this->once())
@@ -136,27 +129,24 @@ class GitHubEventProcessorTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
-    public function it_should_skip_processing_if_event_type_is_not_supported(): void
+    public function testItShouldSkipProcessingIfEventTypeIsNotSupported(): void
     {
         $rawEvent = [
-            'id' => '12345',
-            'type' => 'UnsupportedEventType',
+            'id'         => '12345',
+            'type'       => 'UnsupportedEventType',
             'created_at' => '2023-01-01T05:00:00Z',
-            'actor' => [
-                'id' => 123,
-                'login' => 'testuser',
-                'url' => 'https://api.github.com/users/testuser',
-                'avatar_url' => 'https://avatars.githubusercontent.com/u/123'
+            'actor'      => [
+                'id'         => 123,
+                'login'      => 'testuser',
+                'url'        => 'https://api.github.com/users/testuser',
+                'avatar_url' => 'https://avatars.githubusercontent.com/u/123',
             ],
             'repo' => [
-                'id' => 456,
+                'id'   => 456,
                 'name' => 'testuser/testrepo',
-                'url' => 'https://api.github.com/repos/testuser/testrepo'
+                'url'  => 'https://api.github.com/repos/testuser/testrepo',
             ],
-            'payload' => []
+            'payload' => [],
         ];
 
         $this->readEventRepository->expects($this->never())->method('exist');
@@ -168,27 +158,24 @@ class GitHubEventProcessorTest extends TestCase
         $this->assertFalse($result);
     }
 
-    /**
-     * @test
-     */
-    public function it_should_throw_exception_when_processing_fails(): void
+    public function testItShouldThrowExceptionWhenProcessingFails(): void
     {
         $rawEvent = [
-            'id' => '12345',
-            'type' => GitHubEventType::PUSH->value,
+            'id'         => '12345',
+            'type'       => GitHubEventType::PUSH->value,
             'created_at' => '2023-01-01T05:00:00Z',
-            'actor' => [
-                'id' => 123,
-                'login' => 'testuser',
-                'url' => 'https://api.github.com/users/testuser',
-                'avatar_url' => 'https://avatars.githubusercontent.com/u/123'
+            'actor'      => [
+                'id'         => 123,
+                'login'      => 'testuser',
+                'url'        => 'https://api.github.com/users/testuser',
+                'avatar_url' => 'https://avatars.githubusercontent.com/u/123',
             ],
             'repo' => [
-                'id' => 456,
+                'id'   => 456,
                 'name' => 'testuser/testrepo',
-                'url' => 'https://api.github.com/repos/testuser/testrepo'
+                'url'  => 'https://api.github.com/repos/testuser/testrepo',
             ],
-            'payload' => ['ref' => 'refs/heads/main']
+            'payload' => ['ref' => 'refs/heads/main'],
         ];
 
         $this->readEventRepository->expects($this->once())
@@ -206,31 +193,28 @@ class GitHubEventProcessorTest extends TestCase
         $this->processor->processRawEvent($rawEvent);
     }
 
-    /**
-     * @test
-     */
-    public function it_should_process_comment_event_with_comment_data(): void
+    public function testItShouldProcessCommentEventWithCommentData(): void
     {
         $rawEvent = [
-            'id' => '12345',
-            'type' => GitHubEventType::ISSUE_COMMENT->value,
+            'id'         => '12345',
+            'type'       => GitHubEventType::ISSUE_COMMENT->value,
             'created_at' => '2023-01-01T05:00:00Z',
-            'actor' => [
-                'id' => 123,
-                'login' => 'testuser',
-                'url' => 'https://api.github.com/users/testuser',
-                'avatar_url' => 'https://avatars.githubusercontent.com/u/123'
+            'actor'      => [
+                'id'         => 123,
+                'login'      => 'testuser',
+                'url'        => 'https://api.github.com/users/testuser',
+                'avatar_url' => 'https://avatars.githubusercontent.com/u/123',
             ],
             'repo' => [
-                'id' => 456,
+                'id'   => 456,
                 'name' => 'testuser/testrepo',
-                'url' => 'https://api.github.com/repos/testuser/testrepo'
+                'url'  => 'https://api.github.com/repos/testuser/testrepo',
             ],
             'payload' => [
                 'comment' => [
-                    'body' => 'This is a test comment'
-                ]
-            ]
+                    'body' => 'This is a test comment',
+                ],
+            ],
         ];
 
         $this->readEventRepository->expects($this->once())
@@ -252,9 +236,9 @@ class GitHubEventProcessorTest extends TestCase
             ->method('persist')
             ->with(
                 $this->callback(function (Event $event) {
-                    return $event->type() === EventType::COMMENT && 
-                           isset($event->payload()['comment']['body']) && 
-                           $event->payload()['comment']['body'] === 'This is a test comment';
+                    return $event->type() === EventType::COMMENT
+                           && isset($event->payload()['comment']['body'])
+                           && $event->payload()['comment']['body'] === 'This is a test comment';
                 }),
                 false
             );

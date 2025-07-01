@@ -11,6 +11,7 @@ final class GitHubEventDto
 {
     /**
      * @Assert\NotBlank
+     *
      * @Assert\Positive
      */
     private int $id;
@@ -22,6 +23,7 @@ final class GitHubEventDto
 
     /**
      * @Assert\NotBlank
+     *
      * @Assert\Type("\DateTimeInterface")
      */
     private string $createdAt;
@@ -30,32 +32,33 @@ final class GitHubEventDto
      * @Assert\Valid
      */
     private ActorDto $actor;
-    
+
     /**
      * @Assert\Valid
      */
     private RepoDto $repo;
-    
+
     /**
      * @Assert\Type("array")
+     *
      * @Assert\NotNull
      */
     private array $payload;
-    
+
     private ?string $comment = null;
 
     public function __construct(array $rawEvent)
     {
-        $this->id = (int) ($rawEvent['id'] ?? 0);
-        $this->type = (string) ($rawEvent['type'] ?? '');
+        $this->id        = (int) ($rawEvent['id'] ?? 0);
+        $this->type      = (string) ($rawEvent['type'] ?? '');
         $this->createdAt = (string) ($rawEvent['created_at'] ?? '');
-        $this->actor = new ActorDto($rawEvent['actor'] ?? []);
-        $this->repo = new RepoDto($rawEvent['repo'] ?? []);
-        
+        $this->actor     = new ActorDto($rawEvent['actor'] ?? []);
+        $this->repo      = new RepoDto($rawEvent['repo'] ?? []);
+
         $this->payload = $this->removeNullBytes($rawEvent['payload'] ?? []);
-        
-        if (in_array($this->type, [GitHubEventType::ISSUE_COMMENT, GitHubEventType::COMMIT_COMMENT, GitHubEventType::PULL_REQUEST_REVIEW_COMMENT])) {
-            $comment = (string) ($this->payload['comment']['body'] ?? null);
+
+        if (\in_array($this->type, [GitHubEventType::ISSUE_COMMENT, GitHubEventType::COMMIT_COMMENT, GitHubEventType::PULL_REQUEST_REVIEW_COMMENT])) {
+            $comment       = (string) ($this->payload['comment']['body'] ?? null);
             $this->comment = $this->sanitizeComment($comment);
         }
     }
@@ -89,7 +92,7 @@ final class GitHubEventDto
     {
         return $this->actor->getLogin();
     }
-    
+
     public function getActorUrl(): string
     {
         return $this->actor->getUrl();
@@ -133,19 +136,22 @@ final class GitHubEventDto
     private function sanitizeComment(string $comment): string
     {
         $comment = strip_tags(trim($comment));
+
         return str_replace("\0", '', $comment);
     }
 
     public function removeNullBytes(mixed $value): mixed
     {
-        if (is_string($value)) {
+        if (\is_string($value)) {
             return str_replace("\0", '', $value);
-        } elseif (is_array($value)) {
+        } elseif (\is_array($value)) {
             foreach ($value as $k => $v) {
                 $value[$k] = $this->removeNullBytes($v);
             }
+
             return $value;
         }
+
         return $value;
     }
 }

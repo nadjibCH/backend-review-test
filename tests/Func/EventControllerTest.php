@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Func;
 
 use App\DataFixtures\EventFixtures;
 use Doctrine\ORM\Tools\SchemaTool;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class EventControllerTest extends WebTestCase
 {
@@ -20,8 +22,8 @@ class EventControllerTest extends WebTestCase
         static::$client = static::createClient();
 
         $entityManager = static::getContainer()->get('doctrine.orm.entity_manager');
-        $metaData = $entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool = new SchemaTool($entityManager);
+        $metaData      = $entityManager->getMetadataFactory()->getAllMetadata();
+        $schemaTool    = new SchemaTool($entityManager);
         $schemaTool->updateSchema($metaData);
 
         $this->databaseTool = static::getContainer()->get(DatabaseToolCollection::class)->get();
@@ -37,7 +39,7 @@ class EventControllerTest extends WebTestCase
 
         $client->request(
             'PATCH',
-            sprintf('/api/events/%d/comment', EventFixtures::EVENT_1_ID),
+            \sprintf('/api/events/%d/comment', EventFixtures::EVENT_1_ID),
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
@@ -47,14 +49,13 @@ class EventControllerTest extends WebTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
     }
 
-
     public function testUpdateShouldReturnHttpNotFoundResponse(): void
     {
         $client = static::$client;
 
         $client->request(
             'PATCH',
-            sprintf('/api/events/%d/comment', 7897897897),
+            \sprintf('/api/events/%d/comment', 7897897897),
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
@@ -82,7 +83,7 @@ class EventControllerTest extends WebTestCase
 
         $client->request(
             'PATCH',
-            sprintf('/api/events/%d/comment', EventFixtures::EVENT_1_ID),
+            \sprintf('/api/events/%d/comment', EventFixtures::EVENT_1_ID),
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
@@ -92,7 +93,6 @@ class EventControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $content = $client->getResponse()->getContent();
         self::assertJsonStringEqualsJsonString($expectedResponse, $content === false ? '' : $content);
-
     }
 
     /**
@@ -104,14 +104,14 @@ class EventControllerTest extends WebTestCase
             <<<JSON
               {
                 "comment": "short"
-                
+
             }
             JSON,
             <<<JSON
                 {
                     "message": "This value is too short. It should have 20 characters or more."
                 }
-            JSON
+            JSON,
         ];
     }
 }

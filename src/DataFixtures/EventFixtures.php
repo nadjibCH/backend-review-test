@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Entity\Actor;
@@ -13,7 +15,7 @@ class EventFixtures extends Fixture
 {
     public const int EVENT_1_ID = 1;
     public const int ACTOR_1_ID = 1;
-    public const int REPO_1_ID = 1;
+    public const int REPO_1_ID  = 1;
 
     public function load(ObjectManager $manager): void
     {

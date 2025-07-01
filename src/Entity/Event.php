@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Webmozart\Assert\Assert;
 
 /**
  * @ORM\Entity()
+ *
  * @ORM\Table(
  *     name="`event`",
  *     indexes={
+ *
  *         @ORM\Index(name="IDX_EVENT_TYPE",       columns={"type"}),
  *         @ORM\Index(name="IDX_EVENT_CREATED_AT", columns={"created_at"})
  *     }
@@ -21,7 +22,9 @@ class Event
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(type="bigint")
+     *
      * @ORM\GeneratedValue(strategy="NONE")
      */
     private int $id;
@@ -38,12 +41,14 @@ class Event
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Actor", cascade={"persist"})
+     *
      * @ORM\JoinColumn(name="actor_id", referencedColumnName="id")
      */
     private Actor $actor;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Repo", cascade={"persist"})
+     *
      * @ORM\JoinColumn(name="repo_id", referencedColumnName="id")
      */
     private Repo $repo;
@@ -67,12 +72,12 @@ class Event
     {
         $this->id = $id;
         EventType::assertValidChoice($type);
-        $this->type = $type;
-        $this->actor = $actor;
-        $this->repo = $repo;
-        $this->payload = $payload;
+        $this->type      = $type;
+        $this->actor     = $actor;
+        $this->repo      = $repo;
+        $this->payload   = $payload;
         $this->createdAt = $createdAt;
-        $this->comment = $comment;
+        $this->comment   = $comment;
 
         if ($type === EventType::COMMIT) {
             $this->count = $payload['size'] ?? 1;

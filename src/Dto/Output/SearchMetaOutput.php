@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto\Output;
 
 class SearchMetaOutput
@@ -13,11 +15,11 @@ class SearchMetaOutput
         int $totalEvents,
         int $totalPullRequests,
         int $totalCommits,
-        int $totalComments
+        int $totalComments,
     ) {
-        $this->totalEvents = $totalEvents;
+        $this->totalEvents       = $totalEvents;
         $this->totalPullRequests = $totalPullRequests;
-        $this->totalCommits = $totalCommits;
-        $this->totalComments = $totalComments;
+        $this->totalCommits      = $totalCommits;
+        $this->totalComments     = $totalComments;
     }
 }

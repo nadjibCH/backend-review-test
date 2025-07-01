@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Dto\Input\EventCommentInput;
@@ -16,13 +18,13 @@ class DbalWriteEventRepository implements WriteEventRepository
 
     // Cache for actors and repos to avoid multiple database lookups
     private array $actorCache = [];
-    private array $repoCache = [];
+    private array $repoCache  = [];
 
     public function __construct(
         Connection $connection,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
     ) {
-        $this->connection = $connection;
+        $this->connection    = $connection;
         $this->entityManager = $entityManager;
     }
 
@@ -51,17 +53,17 @@ SQL;
     }
 
     /**
-     * Clears the caches and the EntityManager
+     * Clears the caches and the EntityManager.
      */
     public function clear(): void
     {
         $this->actorCache = [];
-        $this->repoCache = [];
+        $this->repoCache  = [];
         $this->entityManager->clear();
     }
 
     /**
-     * Finds or creates an actor
+     * Finds or creates an actor.
      */
     public function findOrCreateActor(int $id, string $login, string $url, string $avatarUrl): Actor
     {
@@ -77,11 +79,12 @@ SQL;
             $this->entityManager->persist($actor);
         }
         $this->actorCache[$id] = $actor;
+
         return $actor;
     }
 
     /**
-     * Finds or creates a repository
+     * Finds or creates a repository.
      */
     public function findOrCreateRepo(int $id, string $name, string $url): Repo
     {
@@ -99,6 +102,7 @@ SQL;
         }
 
         $this->repoCache[$id] = $repo;
+
         return $repo;
     }
 }

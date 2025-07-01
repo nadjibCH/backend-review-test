@@ -40,7 +40,7 @@ class ImportGitHubEventsCommand extends Command
     {
         $this
             ->setDescription('Import GitHub events')
-            ->addArgument('date', InputArgument::REQUIRED, 'Date in format ' . $this->dateFormat)
+            ->addArgument('date', InputArgument::REQUIRED, 'Date in format '.$this->dateFormat)
             ->addOption('hour', null, InputOption::VALUE_REQUIRED, 'Specific hour to import (0-23)');
     }
 
@@ -54,6 +54,7 @@ class ImportGitHubEventsCommand extends Command
             foreach ($inputDto->getValidationErrors() as $error) {
                 $io->error($error);
             }
+
             return Command::INVALID;
         }
 
@@ -61,11 +62,11 @@ class ImportGitHubEventsCommand extends Command
         $hour = $inputDto->getHour();
 
         $io->title('GitHub Events Importer');
-        $io->section("Importing events for date: $date" .
+        $io->section("Importing events for date: $date".
             ($hour !== null ? ", hour: $hour" : ''));
 
         $totalImportedByDay = 0;
-        $hours = $hour !== null ? [(int) $hour] : range(0, 23);
+        $hours              = $hour !== null ? [(int) $hour] : range(0, 23);
 
         foreach ($hours as $currentHour) {
             $url = $this->archiveStreamer->generateArchiveUrl($date, $currentHour);
@@ -78,8 +79,8 @@ class ImportGitHubEventsCommand extends Command
 
                 foreach ($events as $event) {
                     if ($this->eventProcessor->processRawEvent($event)) {
-                        $this->processedCount++;
-                        $totalImportedByHour++;
+                        ++$this->processedCount;
+                        ++$totalImportedByHour;
 
                         // Batch flush to optimize performance
                         if ($this->processedCount % self::FLUSH_BATCH_SIZE === 0) {
@@ -93,13 +94,14 @@ class ImportGitHubEventsCommand extends Command
                 $io->comment("Processed {$totalImportedByHour} events from {$url}");
             } catch (\Exception $e) {
                 $this->errorFileLogger->log($this->logFolderName, $url, $e, ['url' => $url, 'hour' => $currentHour, 'date' => $date]);
-                $io->error("Error processing $url: " . $e->getMessage());
+                $io->error("Error processing $url: ".$e->getMessage());
             }
         }
 
         $this->flushBatch($io);
 
         $io->success("Import completed! Total events imported: $totalImportedByDay");
+
         return Command::SUCCESS;
     }
 
@@ -111,7 +113,7 @@ class ImportGitHubEventsCommand extends Command
 
             $io->write('<fg=yellow;options=bold>★</>');
         } catch (\Exception $exception) {
-            $io->error('Error flushing: ' . $exception->getMessage());
+            $io->error('Error flushing: '.$exception->getMessage());
             throw FlushBatchException::fromPreviousException($exception);
         }
     }

@@ -1,21 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Service\SearchService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
 readonly class SearchController
 {
     public function __construct(
         private SearchService $searchService,
-        private SerializerInterface $serializer
-    ) {}
+        private SerializerInterface $serializer,
+    ) {
+    }
 
     /**
      * @Route(path="/api/search", name="api_search", methods={"GET"})
@@ -24,7 +27,7 @@ readonly class SearchController
     {
         try {
             $output = $this->searchService->processSearch($request->query->all());
-            
+
             return new JsonResponse(
                 $this->serializer->serialize($output, 'json'),
                 Response::HTTP_OK,

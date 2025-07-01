@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Dto\Input\SearchInput;
@@ -18,8 +20,9 @@ readonly class SearchService
     public function __construct(
         private ReadEventRepository $repository,
         private DenormalizerInterface $denormalizer,
-        private ValidatorInterface $validator
-    ) {}
+        private ValidatorInterface $validator,
+    ) {
+    }
 
     public function processSearch(array $queryParams): SearchOutput
     {
@@ -32,9 +35,9 @@ readonly class SearchService
             );
 
             $errors = $this->validator->validate($searchInput);
-            if (count($errors) > 0) {
+            if (\count($errors) > 0) {
                 $violation = $errors->get(0);
-                $message = (string) $violation->getMessage();
+                $message   = (string) $violation->getMessage();
                 throw new BadRequestHttpException($message);
             }
 
@@ -43,8 +46,8 @@ readonly class SearchService
             $meta = new SearchMetaOutput(
                 $this->repository->countAll($searchInput),
                 $countByType[EventType::PULL_REQUEST] ?? 0,
-                $countByType[EventType::COMMIT] ?? 0,
-                $countByType[EventType::COMMENT] ?? 0
+                $countByType[EventType::COMMIT]       ?? 0,
+                $countByType[EventType::COMMENT]      ?? 0
             );
 
             $data = new SearchDataOutput(
@@ -54,7 +57,7 @@ readonly class SearchService
 
             return new SearchOutput($meta, $data);
         } catch (NotNormalizableValueException $e) {
-            throw new BadRequestHttpException('Invalid date format: ' . $e->getMessage());
+            throw new BadRequestHttpException('Invalid date format: '.$e->getMessage());
         }
     }
 }

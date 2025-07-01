@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Unit\Service;
 
 use App\Dto\Input\EventCommentInput;
 use App\Repository\ReadEventRepository;
 use App\Repository\WriteEventRepository;
 use App\Service\EventCommentService;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -14,11 +17,9 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class EventCommentServiceTest extends TestCase
 {
-    
     private ReadEventRepository&MockObject $readEventRepository;
     private WriteEventRepository&MockObject $writeEventRepository;
     private SerializerInterface&MockObject $serializer;
@@ -28,9 +29,9 @@ class EventCommentServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->writeEventRepository = $this->createMock(WriteEventRepository::class);
-        $this->readEventRepository = $this->createMock(ReadEventRepository::class);
-        $this->serializer = $this->createMock(SerializerInterface::class);
-        $this->validator = $this->createMock(ValidatorInterface::class);
+        $this->readEventRepository  = $this->createMock(ReadEventRepository::class);
+        $this->serializer           = $this->createMock(SerializerInterface::class);
+        $this->validator            = $this->createMock(ValidatorInterface::class);
 
         $this->service = new EventCommentService(
             $this->writeEventRepository,
@@ -42,9 +43,9 @@ class EventCommentServiceTest extends TestCase
 
     public function testProcessEventCommentUpdateSuccess(): void
     {
-        $eventId = 123;
+        $eventId     = 123;
         $jsonContent = '{"comment": "This is a valid comment with more than 20 characters"}';
-        $eventInput = new EventCommentInput($jsonContent);
+        $eventInput  = new EventCommentInput($jsonContent);
 
         $this->readEventRepository->expects($this->once())
             ->method('exist')
@@ -66,13 +67,13 @@ class EventCommentServiceTest extends TestCase
             ->with($eventInput, $eventId);
 
         $this->service->processEventCommentUpdate($jsonContent, $eventId);
-        
+
         $this->addToAssertionCount(1);
     }
 
     public function testProcessEventCommentUpdateEventNotFound(): void
     {
-        $eventId = 456;
+        $eventId     = 456;
         $jsonContent = '{"comment": "This is a valid comment"}';
 
         $this->readEventRepository->expects($this->once())
@@ -88,7 +89,7 @@ class EventCommentServiceTest extends TestCase
 
     public function testProcessEventCommentUpdateInvalidJson(): void
     {
-        $eventId = 123;
+        $eventId            = 123;
         $invalidJsonContent = '{comment: Invalid JSON}';
 
         $this->readEventRepository->expects($this->once())
@@ -109,12 +110,12 @@ class EventCommentServiceTest extends TestCase
 
     public function testProcessEventCommentUpdateValidationError(): void
     {
-        $eventId = 123;
+        $eventId     = 123;
         $jsonContent = '{"comment": "short"}';
-        $eventInput = new EventCommentInput($jsonContent);
+        $eventInput  = new EventCommentInput($jsonContent);
 
-        $errorMessage = "This value is too short. It should have 20 characters or more.";
-        $violation = $this->createMock(ConstraintViolation::class);
+        $errorMessage = 'This value is too short. It should have 20 characters or more.';
+        $violation    = $this->createMock(ConstraintViolation::class);
         $violation->expects($this->once())
             ->method('getMessage')
             ->willReturn($errorMessage);

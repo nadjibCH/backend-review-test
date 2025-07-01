@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Dto\Input\EventCommentInput;
@@ -11,19 +13,19 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-
 readonly class EventCommentService
 {
     public function __construct(
         private WriteEventRepository $writeEventRepository,
         private ReadEventRepository $readEventRepository,
         private SerializerInterface $serializer,
-        private ValidatorInterface $validator
-    ) {}
+        private ValidatorInterface $validator,
+    ) {
+    }
 
     public function processEventCommentUpdate(string $content, int $eventId): void
     {
-        if (! $this->readEventRepository->exist($eventId)) {
+        if (!$this->readEventRepository->exist($eventId)) {
             throw new NotFoundHttpException("Event identified by $eventId not found !");
         }
 
@@ -34,9 +36,9 @@ readonly class EventCommentService
         }
 
         $errors = $this->validator->validate($input);
-        if (count($errors) > 0) {
+        if (\count($errors) > 0) {
             $violation = $errors->get(0);
-            $message = (string) $violation->getMessage();
+            $message   = (string) $violation->getMessage();
             throw new BadRequestHttpException($message);
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Dto\Input\SearchInput;
@@ -16,15 +18,15 @@ class DbalReadEventRepository implements ReadEventRepository
     {
         $this->connection = $connection;
     }
-    
+
     /**
-     * Calculate the start and end of the day for a given date to use the created_at index
+     * Calculate the start and end of the day for a given date to use the created_at index.
      */
     private function getDayBoundaries(\DateTimeImmutable $date): array
     {
         return [
             'start' => $date->setTime(0, 0, 0),
-            'end'   => $date->setTime(23, 59, 59)
+            'end'   => $date->setTime(23, 59, 59),
         ];
     }
 
@@ -34,7 +36,7 @@ class DbalReadEventRepository implements ReadEventRepository
     public function countAll(SearchInput $searchInput): int
     {
         ['start' => $start, 'end' => $end] = $this->getDayBoundaries($searchInput->date);
-        
+
         $sql = <<<SQL
         SELECT sum(count) as count
         FROM event
@@ -45,9 +47,9 @@ SQL;
         return (int) $this->connection->fetchOne(
             $sql,
             [
-                'start' => $start,
-                'end' => $end,
-                'keyword' => '%' . $searchInput->keyword . '%'
+                'start'   => $start,
+                'end'     => $end,
+                'keyword' => '%'.$searchInput->keyword.'%',
             ],
             [
                 'start'   => Types::DATETIME_IMMUTABLE,
@@ -75,9 +77,9 @@ SQL;
         return $this->connection->fetchAllKeyValue(
             $sql,
             [
-                'start' => $start,
-                'end' => $end,
-                'keyword' => '%' . $searchInput->keyword . '%'
+                'start'   => $start,
+                'end'     => $end,
+                'keyword' => '%'.$searchInput->keyword.'%',
             ],
             [
                 'start'   => Types::DATETIME_IMMUTABLE,
@@ -93,7 +95,7 @@ SQL;
     public function statsByTypePerHour(SearchInput $searchInput): array
     {
         ['start' => $start, 'end' => $end] = $this->getDayBoundaries($searchInput->date);
-        
+
         $sql = <<<SQL
             SELECT extract(hour from created_at) as hour, type, sum(count) as count
             FROM event
@@ -105,9 +107,9 @@ SQL;
         $stats = $this->connection->fetchAllAssociative(
             $sql,
             [
-                'start' => $start,
-                'end' => $end,
-                'keyword' => '%' . $searchInput->keyword . '%'
+                'start'   => $start,
+                'end'     => $end,
+                'keyword' => '%'.$searchInput->keyword.'%',
             ],
             [
                 'start'   => Types::DATETIME_IMMUTABLE,
@@ -131,7 +133,7 @@ SQL;
     public function getLatest(SearchInput $searchInput): array
     {
         ['start' => $start, 'end' => $end] = $this->getDayBoundaries($searchInput->date);
-        
+
         $sql = <<<SQL
             SELECT e.type, r.name AS repo, e.payload::text AS payload
             FROM event e
@@ -145,9 +147,9 @@ SQL;
         $result = $this->connection->fetchAllAssociative(
             $sql,
             [
-                'start' => $start,
-                'end' => $end,
-                'keyword' => '%' . $searchInput->keyword . '%',
+                'start'   => $start,
+                'end'     => $end,
+                'keyword' => '%'.$searchInput->keyword.'%',
             ],
             [
                 'start'   => Types::DATETIME_IMMUTABLE,
@@ -156,7 +158,7 @@ SQL;
             ]
         );
 
-        return array_map(static function($item) {
+        return array_map(static function ($item) {
             $item['repo'] = json_decode($item['repo'], true);
 
             return $item;
@@ -175,7 +177,7 @@ SQL;
         SQL;
 
         $result = $this->connection->fetchOne($sql, [
-            'id' => $id
+            'id' => $id,
         ]);
 
         return (bool) $result;
