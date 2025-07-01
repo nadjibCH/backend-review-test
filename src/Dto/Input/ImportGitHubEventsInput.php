@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Dto\Input;
+use Symfony\Component\Console\Input\InputInterface;
 
 class ImportGitHubEventsInput
 {
@@ -70,7 +71,7 @@ class ImportGitHubEventsInput
         return $this->isValid;
     }
     
-    public static function fromConsoleInput($input, string $dateFormat = 'Y-m-d'): self
+    public static function fromConsoleInput(InputInterface $input, string $dateFormat = 'Y-m-d'): self
     {
         return new self(
             $input->getArgument('date'),

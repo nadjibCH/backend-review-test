@@ -33,7 +33,9 @@ readonly class SearchService
 
             $errors = $this->validator->validate($searchInput);
             if (count($errors) > 0) {
-                throw new BadRequestHttpException($errors[0]->getMessage());
+                $violation = $errors->get(0);
+                $message = (string) $violation->getMessage();
+                throw new BadRequestHttpException($message);
             }
 
             $countByType = $this->repository->countByType($searchInput);

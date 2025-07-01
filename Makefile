@@ -111,4 +111,10 @@ func-test: var/docker.up ## Run PhpUnit functional testsuite
 	@$(call log_success,Done)
 
 .PHONY: test
-test: db-test unit-test func-test ## Run all testsuites
+test: db-test unit-test func-test ## Run all testsuite
+
+.PHONY: phpstan cs-check cs-fix
+## Analyse statique avec PHPStan
+phpstan:
+	docker compose exec php vendor/bin/phpstan analyse --ansi --memory-limit=1G
+

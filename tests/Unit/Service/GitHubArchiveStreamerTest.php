@@ -21,10 +21,7 @@ class GitHubArchiveStreamerTest extends TestCase
     private const string TEST_DATE = '2023-01-01';
     private const int TEST_HOUR = 5;
 
-    /**
-     * @var HttpClientInterface&MockObject
-     */
-    private $httpClient;
+    private HttpClientInterface&MockObject $httpClient;
     
     private GitHubArchiveStreamer $streamer;
 

@@ -15,12 +15,14 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SearchServiceTest extends TestCase
 {
-    private ReadEventRepository $repository;
-    private DenormalizerInterface $denormalizer;
-    private ValidatorInterface $validator;
+    private ReadEventRepository&MockObject $repository;
+    private DenormalizerInterface&MockObject $denormalizer;
+    private ValidatorInterface&MockObject $validator;
+
     private SearchService $service;
 
     protected function setUp(): void

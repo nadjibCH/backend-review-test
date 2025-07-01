@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
 
-class EventType extends AbstractEnumType
+final class EventType extends AbstractEnumType
 {
     public const string COMMIT = 'COM';
     public const string COMMENT = 'MSG';

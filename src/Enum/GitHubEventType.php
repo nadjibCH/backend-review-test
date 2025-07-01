@@ -17,13 +17,12 @@ enum GitHubEventType: string
     /**
      * Maps GitHub event type to internal EventType
      */
-    public function toEventType(): ?string
+    public function toEventType(): string
     {
         return match($this) {
             self::PUSH => EventType::COMMIT,
             self::ISSUE_COMMENT, self::COMMIT_COMMENT, self::PULL_REQUEST_REVIEW_COMMENT => EventType::COMMENT,
             self::PULL_REQUEST => EventType::PULL_REQUEST,
-            default => null,
         };
     }
 

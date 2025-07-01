@@ -35,7 +35,9 @@ readonly class EventCommentService
 
         $errors = $this->validator->validate($input);
         if (count($errors) > 0) {
-            throw new BadRequestHttpException($errors[0]->getMessage());
+            $violation = $errors->get(0);
+            $message = (string) $violation->getMessage();
+            throw new BadRequestHttpException($message);
         }
 
         $this->writeEventRepository->update($input, $eventId);

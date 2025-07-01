@@ -113,4 +113,9 @@ class Event
     {
         return $this->comment;
     }
+
+    public function count(): int
+    {
+        return $this->count;
+    }
 }

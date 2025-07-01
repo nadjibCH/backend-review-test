@@ -46,6 +46,9 @@ class GitHubArchiveStreamer
 
             // Initialize inflate to decompress gzip
             $inflate = inflate_init(ZLIB_ENCODING_GZIP);
+            if ($inflate === false) {
+                throw new GitHubArchiveStreamingException('Failed to initialize inflate context for decompression');
+            }
 
             $buffer = '';
 

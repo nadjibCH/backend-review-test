@@ -18,15 +18,8 @@ use PHPUnit\Framework\TestCase;
 
 class GitHubEventProcessorTest extends TestCase
 {
-    /**
-     * @var WriteEventRepository&MockObject
-     */
-    private $writeEventRepository;
-    
-    /**
-     * @var ReadEventRepository&MockObject
-     */
-    private $readEventRepository;
+    private WriteEventRepository&MockObject $writeEventRepository;
+    private ReadEventRepository&MockObject $readEventRepository;
     private GitHubEventProcessor $processor;
 
     protected function setUp(): void

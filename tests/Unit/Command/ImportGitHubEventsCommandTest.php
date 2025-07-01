@@ -25,22 +25,19 @@ class ImportGitHubEventsCommandTest extends TestCase
     private const int TEST_HOUR = 5;
     private const string TEST_URL_PATTERN = 'https://data.gharchive.org/%s-%d.json.gz';
 
-    private GitHubArchiveStreamer|MockObject $archiveStreamer;
-    private GitHubEventProcessor|MockObject $eventProcessor;
-    private WriteEventRepository|MockObject $writeEventRepository;
-    private ErrorFileLogger|MockObject $errorFileLogger;
+    private GitHubArchiveStreamer&MockObject $archiveStreamer;
+    private GitHubEventProcessor&MockObject $eventProcessor;
+    private WriteEventRepository&MockObject $writeEventRepository;
+    private ErrorFileLogger&MockObject $errorFileLogger;
     private CommandTester $commandTester;
     private ImportGitHubEventsCommand $command;
 
     protected function setUp(): void
     {
-        /** @var GitHubArchiveStreamer&MockObject $archiveStreamer */
         $this->archiveStreamer = $this->createMock(GitHubArchiveStreamer::class);
-        /** @var GitHubEventProcessor&MockObject $eventProcessor */
         $this->eventProcessor = $this->createMock(GitHubEventProcessor::class);
-        /** @var WriteEventRepository&MockObject $writeEventRepository */
         $this->writeEventRepository = $this->createMock(WriteEventRepository::class);
-        /** @var ErrorFileLogger&MockObject $errorFileLogger */
+        $this->errorFileLogger = $this->createMock(ErrorFileLogger::class);
         $this->errorFileLogger = $this->createMock(ErrorFileLogger::class);
 
         $this->command = new ImportGitHubEventsCommand(

@@ -136,7 +136,7 @@ final class GitHubEventDto
         return str_replace("\0", '', $comment);
     }
 
-    public function removeNullBytes($value)
+    public function removeNullBytes(mixed $value): mixed
     {
         if (is_string($value)) {
             return str_replace("\0", '', $value);

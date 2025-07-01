@@ -15,4 +15,10 @@ class SearchInput
 
     #[Assert\Type('string')]
     public ?string $keyword = null;
+
+    public function __construct(\DateTimeImmutable $date, ?string $keyword = null)
+    {
+        $this->date = $date;
+        $this->keyword = $keyword;
+    }
 }

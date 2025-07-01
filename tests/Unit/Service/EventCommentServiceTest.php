@@ -14,14 +14,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class EventCommentServiceTest extends TestCase
 {
     
-    private ReadEventRepository $readEventRepository;
-    private WriteEventRepository $writeEventRepository;
-    private SerializerInterface $serializer;
-    private ValidatorInterface $validator;
+    private ReadEventRepository&MockObject $readEventRepository;
+    private WriteEventRepository&MockObject $writeEventRepository;
+    private SerializerInterface&MockObject $serializer;
+    private ValidatorInterface&MockObject $validator;
     private EventCommentService $service;
 
     protected function setUp(): void
