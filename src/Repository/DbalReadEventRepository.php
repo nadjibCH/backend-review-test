@@ -144,7 +144,7 @@ SQL;
             LIMIT 10
 SQL;
 
-        $result = $this->connection->fetchAllAssociative(
+        return $this->connection->fetchAllAssociative(
             $sql,
             [
                 'start'   => $start,
@@ -158,11 +158,11 @@ SQL;
             ]
         );
 
-        return array_map(static function ($item) {
+        // no need, because repo.name is returned
+        /*return array_map(static function ($item) {
             $item['repo'] = json_decode($item['repo'], true);
-
             return $item;
-        }, $result);
+        }, $result);*/
     }
 
     /**

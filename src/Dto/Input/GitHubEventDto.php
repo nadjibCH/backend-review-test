@@ -12,6 +12,7 @@ final class GitHubEventDto
     /**
      * @Assert\NotBlank
      *
+     * @Assert\Type("integer")
      * @Assert\Positive
      */
     private int $id;

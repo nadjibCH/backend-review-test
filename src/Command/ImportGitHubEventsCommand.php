@@ -68,8 +68,13 @@ class ImportGitHubEventsCommand extends Command
         $totalImportedByDay = 0;
         $hours              = $hour !== null ? [(int) $hour] : range(0, 23);
 
+        $hasErrors  = false;
+        $currentUrl = '';
+
         foreach ($hours as $currentHour) {
             $url = $this->archiveStreamer->generateArchiveUrl($date, $currentHour);
+            $currentUrl = $url;
+
             $io->section("Processing $url");
 
             try {
@@ -95,14 +100,26 @@ class ImportGitHubEventsCommand extends Command
             } catch (\Exception $e) {
                 $this->errorFileLogger->log($this->logFolderName, $url, $e, ['url' => $url, 'hour' => $currentHour, 'date' => $date]);
                 $io->error("Error processing $url: ".$e->getMessage());
+                $hasErrors = true;
             }
         }
 
-        $this->flushBatch($io);
+        try {
+            $this->flushBatch($io);
 
-        $io->success("Import completed! Total events imported: $totalImportedByDay");
+            if ($hasErrors) {
+                $io->warning("Import completed with errors! Check logs for details. Total events imported: $totalImportedByDay");
+                return Command::FAILURE;
+            } else {
+                $io->success("Import completed! Total events imported: $totalImportedByDay");
+                return Command::SUCCESS;
+            }
+        } catch (\Exception $e) {
+            $this->errorFileLogger->log($this->logFolderName, $currentUrl, $e, ['Error final flush']);
+            $io->error('Error in final flush! Check logs for details');
 
-        return Command::SUCCESS;
+            return Command::FAILURE;
+        }
     }
 
     private function flushBatch(SymfonyStyle $io): void
@@ -112,6 +129,8 @@ class ImportGitHubEventsCommand extends Command
             $this->writeEventRepository->clear();
 
             $io->write('<fg=yellow;options=bold>★</>');
+            $memoryUsage = round(memory_get_usage() / 1024 / 1024, 2);
+            $io->write("Memory usage: {$memoryUsage}MB // ");
         } catch (\Exception $exception) {
             $io->error('Error flushing: '.$exception->getMessage());
             throw FlushBatchException::fromPreviousException($exception);

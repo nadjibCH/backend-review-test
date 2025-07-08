@@ -12,6 +12,7 @@ final class RepoDto
      * @Assert\NotBlank
      *
      * @Assert\Type("integer")
+     * @Assert\Positive
      */
     private int $id;
 

@@ -33,7 +33,7 @@ readonly class EventController
             return new JsonResponse(['message' => $e->getMessage()], JsonResponse::HTTP_NOT_FOUND);
         } catch (BadRequestHttpException $e) {
             return new JsonResponse(['message' => $e->getMessage()], JsonResponse::HTTP_BAD_REQUEST);
-        } catch (\Doctrine\DBAL\Exception $e) {
+        } catch (\Throwable $e) {
             return new JsonResponse(['message' => 'Service unavailable'], JsonResponse::HTTP_SERVICE_UNAVAILABLE);
         }
     }

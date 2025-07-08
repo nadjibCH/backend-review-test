@@ -116,15 +116,16 @@ test: db-test unit-test func-test ## Run all testsuites
 .PHONY: phpstan cs-check cs-fix
 ## Analyse statique avec PHPStan
 phpstan:
-	docker compose exec php vendor/bin/phpstan analyse --ansi --memory-limit=1G
+	docker compose exec --user root php vendor/bin/phpstan analyse --ansi --memory-limit=1G
 
 ## Vérifie le style avec PHP CS Fixer (dry-run + diff)
 cs-check:
-	docker compose exec php vendor/bin/php-cs-fixer fix \
+	docker compose exec --user root php vendor/bin/php-cs-fixer fix \
 		--config=/app/.php-cs-fixer.dist.php \
 		--dry-run --diff --ansi
 
 ## Applique le style avec PHP CS Fixer
 cs-fix:
-	docker compose exec php vendor/bin/php-cs-fixer fix \
+	docker compose exec --user root php vendor/bin/php-cs-fixer fix \
 		--config=/app/.php-cs-fixer.dist.php --ansi
+

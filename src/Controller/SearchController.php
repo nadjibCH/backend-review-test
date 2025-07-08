@@ -39,7 +39,7 @@ readonly class SearchController
                 ['error' => $e->getMessage()],
                 Response::HTTP_BAD_REQUEST
             );
-        } catch (\Throwable $e) {
+        } catch (\Throwable $e) { // catch all: Exceptions AND errors (ex: error 500)
             return new JsonResponse(
                 ['error' => 'Internal server error'],
                 Response::HTTP_INTERNAL_SERVER_ERROR
